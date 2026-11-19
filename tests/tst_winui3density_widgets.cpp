@@ -828,6 +828,9 @@ void WinUI3DensityWidgetsTest::compactNumberBoxAndUnlistedControlGeometry()
     const int tableRowStandard = table.rowHeight(0);
     const int headerStandard = table.horizontalHeader()->sectionSize(0);
     const int menuItemStandard = menu.actionGeometry(&menuAction).height();
+    // A QTableView row is its vertical header's default section, not the
+    // delegate hint: assert the real row before switching profiles.
+    QCOMPARE(tableRowStandard, 36);
     QCOMPARE(menuItemStandard, 36);
 
     style.setDensityMode(WinUI3::DensityMode::Compact);
@@ -841,7 +844,10 @@ void WinUI3DensityWidgetsTest::compactNumberBoxAndUnlistedControlGeometry()
     QCOMPARE(spinBox.sizeHint().width(), spinStandard.width());
     QCOMPARE(slider.sizeHint(), sliderStandard);
     QCOMPARE(tabs.sizeHint(), tabsStandard);
-    QCOMPARE(table.rowHeight(0), tableRowStandard);
+    // DataGrid-like table rows are a consistency extension: one 8px step in
+    // Compact, while the pinned 32 px DataGrid header stays unchanged.
+    QCOMPARE(table.rowHeight(0), 28);
+    QCOMPARE(table.verticalHeader()->defaultSectionSize(), 28);
     QCOMPARE(table.horizontalHeader()->sectionSize(0), headerStandard);
     QCOMPARE(menu.actionGeometry(&menuAction).height(), 32);
 }

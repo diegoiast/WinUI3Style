@@ -51,6 +51,7 @@
 #include <QFontDatabase>
 #include <QGroupBox>
 #include <QGuiApplication>
+#include <QHeaderView>
 #include <QLinearGradient>
 #include <QListView>
 #include <QLabel>
@@ -636,6 +637,12 @@ void invalidateDensityTree(QWidget *root)
             // QMenu caches its shown layout; sizeHint includes separators and popup margins.
             if (menu->isVisible() && !menu->actions().isEmpty())
                 menu->resize(menu->width(), menu->sizeHint().height());
+        } else if (auto *header = qobject_cast<QHeaderView *>(widget)) {
+            // QHeaderView caches defaultSectionSize from the style and only
+            // refreshes it on StyleChange. A table's vertical default section
+            // is its row height, so notify both headers when density changes.
+            QEvent styleChange(QEvent::StyleChange);
+            QCoreApplication::sendEvent(header, &styleChange);
         }
         if (auto *view = qobject_cast<QAbstractItemView *>(widget)) {
             view->doItemsLayout();

@@ -46,6 +46,10 @@ void WinUI3DensityTest::profilesExposeDocumentedSizing()
     QCOMPARE(compact.listItemHeight, 32);
     QCOMPARE(standard.treeItemHeight, 28);
     QCOMPARE(compact.treeItemHeight, 24);
+    // DataGrid-like table rows are a Fluent consistency extension, not a
+    // pinned Compact Sizing control: they lose one 8px step like list rows.
+    QCOMPARE(standard.tableItemHeight, 36);
+    QCOMPARE(compact.tableItemHeight, 28);
     QCOMPARE(standard.navigationItemHeight, 40);
     QCOMPARE(compact.navigationItemHeight, 32);
     QCOMPARE(standard.comboPopupItemHeight, 40);
@@ -59,7 +63,6 @@ void WinUI3DensityTest::profilesExposeDocumentedSizing()
     QCOMPARE(standard.toggleTrackWidth, compact.toggleTrackWidth);
     QCOMPARE(standard.toggleTrackHeight, compact.toggleTrackHeight);
     QCOMPARE(standard.menuSeparatorHeight, compact.menuSeparatorHeight);
-    QCOMPARE(standard.tableItemHeight, compact.tableItemHeight);
     QCOMPARE(standard.headerHeight, compact.headerHeight);
     QCOMPARE(standard.sliderGrooveMargin, compact.sliderGrooveMargin);
     QCOMPARE(standard.itemSelectionGutter, compact.itemSelectionGutter);

@@ -175,7 +175,10 @@ inline constexpr DensityMetrics makeCompactDensityMetrics()
     m.menuSeparatorHeight = 7;
     m.listItemHeight = 32;
     m.treeItemHeight = 24;
-    m.tableItemHeight = 36;
+    // Fluent consistency extension (DataGrid-like table): rows lose the same
+    // one 8px spacing step as Compact ListView rows. The pinned DataGrid
+    // column-header MinHeight of 32 px stays unchanged.
+    m.tableItemHeight = 28;
     m.navigationItemHeight = 32;
     m.headerHeight = 32;
     // Buttons, tabs, and sliders are not on that resource page; preserve.

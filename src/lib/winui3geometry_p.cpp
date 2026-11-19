@@ -5,6 +5,8 @@
 
 #include <winui3style/winui3style.h>
 
+#include <QHeaderView>
+#include <QTableView>
 #include <QStyleOptionComplex>
 #include <QStyleOptionGroupBox>
 #include <QStyleOptionSlider>
@@ -112,15 +114,32 @@ std::optional<int> pixelMetricValue(QStyle::PixelMetric metric, bool toggleSwitc
     case QStyle::PM_SizeGripSize:
         return 16;
     case QStyle::PM_HeaderMargin:
+        // Qt clamps a header's default section to fontHeight + 2*this margin.
+        // A QTableView vertical header uses the DataGrid row metric below, so
+        // it must not be pushed past 36/28 by the horizontal header's 12 px
+        // inset. Use the pinned 4 px vertical header padding for that clamp.
+        if (const auto *header = qobject_cast<const QHeaderView *>(widget)) {
+            if (header->orientation() == Qt::Vertical
+                && qobject_cast<const QTableView *>(header->parentWidget()))
+                return metrics.headerVerticalPadding;
+        }
         return 12;
     case QStyle::PM_HeaderMarkSize:
         return 12;
     case QStyle::PM_HeaderGripMargin:
         return 4;
     case QStyle::PM_HeaderDefaultSectionSizeVertical:
-        // QHeaderView's default section is historically 36 px even though
-        // CT_HeaderSection has a 32 px minimum. Compact Sizing does not cover
-        // data-grid headers, so both profiles retain that distinction.
+        // QHeaderView's default vertical section is the row height QTableView
+        // reports. DataGrid-like rows are a Fluent consistency extension:
+        // 36 px Standard, 28 px Compact (one 8px spacing step like ListView).
+        // The DataGrid header band itself keeps its pinned 32 px MinHeight via
+        // CT_HeaderSection, so the two metrics stay distinct. Other views'
+        // vertical headers keep the historical 36 px default.
+        if (const auto *header = qobject_cast<const QHeaderView *>(widget)) {
+            if (header->orientation() == Qt::Vertical
+                && qobject_cast<const QTableView *>(header->parentWidget()))
+                return metrics.tableItemHeight;
+        }
         return 36;
     case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
         return 100;

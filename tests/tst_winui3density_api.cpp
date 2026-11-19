@@ -410,13 +410,13 @@ void WinUI3DensityApiTest::geometryContractsAndInvariants()
             style.sizeFromContents(QStyle::CT_SpinBox, &dateOption, content, &date);
     const QSize standardMenu =
             style.sizeFromContents(QStyle::CT_MenuItem, &menuOption, content, &menu);
-    const QSize invariantTable =
+    const QSize standardTable =
             style.sizeFromContents(QStyle::CT_ItemViewItem, &generic, content, table.viewport());
     const QSize invariantHeader = style.sizeFromContents(QStyle::CT_HeaderSection, &generic,
                                                          content, table.horizontalHeader());
     const int invariantButtonMargin = style.pixelMetric(QStyle::PM_ButtonMargin, nullptr, &button);
-    const int invariantHeaderDefault = style.pixelMetric(
-            QStyle::PM_HeaderDefaultSectionSizeVertical, nullptr, table.horizontalHeader());
+    const int standardHeaderDefault = style.pixelMetric(QStyle::PM_HeaderDefaultSectionSizeVertical,
+                                                        nullptr, table.verticalHeader());
 
     root.setProperty(WinUI3::Style::DensityProperty, QStringLiteral("compact"));
 
@@ -446,17 +446,22 @@ void WinUI3DensityApiTest::geometryContractsAndInvariants()
     QCOMPARE(style.sizeFromContents(QStyle::CT_MenuItem, &menuOption, content, &menu).height(), 32);
     QCOMPARE(style.sizeFromContents(QStyle::CT_PushButton, &buttonOption, content, &button),
              invariantButton);
-    QCOMPARE(style.sizeFromContents(QStyle::CT_ItemViewItem, &generic, content, table.viewport()),
-             invariantTable);
+    QCOMPARE(standardTable.height(), 36);
+    const QSize compactTable =
+            style.sizeFromContents(QStyle::CT_ItemViewItem, &generic, content, table.viewport());
+    QCOMPARE(compactTable.height(), 28);
+    QCOMPARE(compactTable.width(), standardTable.width());
     QCOMPARE(style.sizeFromContents(QStyle::CT_HeaderSection, &generic, content,
                                     table.horizontalHeader()),
              invariantHeader);
-    QCOMPARE(invariantHeaderDefault, 36);
+    QCOMPARE(standardHeaderDefault, 36);
     QCOMPARE(invariantButtonMargin, 8);
     QCOMPARE(style.pixelMetric(QStyle::PM_ButtonMargin, nullptr, &button), invariantButtonMargin);
+    // The vertical default section is the QTableView row metric; the header
+    // band itself (CT_HeaderSection) stays at its pinned 32 px MinHeight.
     QCOMPARE(style.pixelMetric(QStyle::PM_HeaderDefaultSectionSizeVertical, nullptr,
-                               table.horizontalHeader()),
-             invariantHeaderDefault);
+                               table.verticalHeader()),
+             28);
 }
 
 void WinUI3DensityApiTest::navigationViewRelayoutsAtRuntime()
